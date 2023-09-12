@@ -1,0 +1,60 @@
+@import "./global.css";
+
+.report {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 25rem;
+	padding: 1rem 1rem 2rem 2rem;
+	color: rgb(77, 77, 77);
+
+	background-color: white;
+	border-radius: 5px;
+	box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
+	z-index: 10;
+}
+
+header.report-header {
+	margin-bottom: 2rem;
+	display: flex;
+	align-items: center;
+}
+
+img.report-clock {
+	height: 5rem;
+	width: 5rem;
+	opacity: 0.5;
+}
+
+button.report-close-btn {
+	margin-left: auto;
+}
+
+h2.activity-summary-title {
+	/* margin-bottom: 2rem; */
+	text-align: left;
+}
+
+div.card {
+	color: rgb(213, 117, 114);
+	display: flex;
+	justify-content: center;
+	gap: 4rem;
+}
+
+div.report-text {
+	display: flex;
+	flex-direction: column;
+}
+
+p.display-hours {
+	/* font-family: ArialRounded; */
+	font-size: 3.2rem;
+	font-weight: bold;
+}
+
+p.hours-focused-label {
+	font-weight: bold;
+	font-size: 1.4rem;
+}

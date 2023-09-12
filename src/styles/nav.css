@@ -1,0 +1,30 @@
+@import "./global.css";
+
+nav {
+	display: flex;
+	justify-content: space-between;
+	margin: 2rem auto;
+	width: 62rem;
+	padding-bottom: 25px;
+	border-bottom: solid rgba(66, 66, 66, 0.384) 0.1rem;
+}
+
+img.nav-buttons {
+	width: 1.6rem;
+	height: 1.6rem;
+}
+
+nav div.buttons {
+	display: flex;
+	gap: 2rem;
+}
+
+nav div.buttons button {
+	background-color: rgba(255, 255, 255, 0.1);
+	font-family: "ArialRounded";
+	font-weight: normal;
+	padding: 1rem;
+	display: flex;
+	justify-content: flex-start;
+	gap: 0.5rem;
+}

@@ -1,0 +1,82 @@
+@import "./global.css";
+
+.color-picker-modal {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 40rem;
+	color: rgb(77, 77, 77);
+	background-color: white;
+	border-radius: 5px;
+	box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
+	z-index: 10;
+}
+
+.color-picker-title {
+	padding: 2rem 0 0 0;
+	font-size: 1.4rem;
+	text-align: center;
+	padding-bottom: 1.5rem;
+	border-bottom: solid 0.1rem rgb(210, 210, 210);
+	margin-bottom: 2rem;
+}
+
+.choose-color-squares {
+	padding: 0 1rem 1rem 1rem;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-template-rows: repeat(2, 1fr);
+	grid-column-gap: 1rem;
+	grid-row-gap: 1rem;
+}
+
+.choose-color-square {
+	border-radius: 0.96rem;
+	height: 6.4rem;
+	width: 6.4rem;
+	background-color: blue;
+	position: relative;
+}
+
+div.active::after {
+	content: "";
+	display: block;
+	margin-left: 7px;
+	margin-top: 3px px;
+	width: 5px;
+	height: 11px;
+	border-style: solid;
+	border-color: rgb(255, 255, 255);
+	border-image: initial;
+	border-width: 0px 3px 3px 0px;
+	transform: translate(-120%, -50%) rotate(45deg);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+
+.choose-color-1 {
+	background-color: rgb(186, 73, 73);
+}
+.choose-color-2 {
+	background-color: rgb(56 133 138);
+}
+.choose-color-3 {
+	background-color: rgb(57 112 151);
+}
+.choose-color-4 {
+	background-color: rgb(164, 137, 60);
+}
+.choose-color-5 {
+	background-color: rgb(125 83 162);
+}
+.choose-color-6 {
+	background-color: rgb(175, 78, 145);
+}
+.choose-color-7 {
+	background-color: rgb(81 138 88);
+}
+.choose-color-8 {
+	background-color: rgb(84, 87, 100);
+}

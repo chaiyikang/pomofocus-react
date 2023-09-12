@@ -1,0 +1,17 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+@font-face {
+	font-family: "ArialRounded";
+	font-display: swap;
+	src: url("Arial_Rounded_MT.ttf") format("truetype");
+}
+@font-face {
+	font-family: "ArialRounded";
+	font-display: swap;
+	src: url("Arial-Rounded-MT-Bold.ttf") format("truetype");
+	font-weight: bold;
+}

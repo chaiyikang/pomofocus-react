@@ -1,0 +1,206 @@
+@import "./global.css";
+
+.settings {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 40rem;
+	padding: 2rem;
+	color: rgb(77, 77, 77);
+
+	background-color: white;
+	border-radius: 5px;
+	box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
+	z-index: 10;
+}
+
+img.color-picker-img {
+	height: 1.6rem;
+	width: 1.6rem;
+	display: inline;
+	opacity: 0.3;
+}
+h2.theme-title {
+	display: inline;
+	margin-left: 0.3rem;
+	color: rgb(77, 77, 77);
+}
+
+h3.color-theme-title {
+	font-size: 1.6rem;
+}
+
+div.color-themes-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+}
+
+div.squares {
+	display: flex;
+	gap: 1rem;
+}
+
+h3.color-theme-title {
+	margin-right: 40%;
+}
+
+div.square {
+	height: 2.7rem;
+	width: 2.7rem;
+	border-radius: 0.4rem;
+}
+
+div.pomodoro-square {
+	background-color: rgb(186, 73, 73);
+}
+
+div.short-break-square {
+	background-color: rgb(56, 133, 138);
+}
+
+div.long-break-square {
+	background-color: rgb(57, 112, 151);
+}
+
+h3.time-minutes {
+	font-size: 1.4rem;
+	margin-bottom: 1.5rem;
+}
+
+h2.settings-title {
+	color: grey;
+}
+
+div.timer-title {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 1.5rem;
+}
+
+img.timer-img {
+	height: 1.6rem;
+	width: 1.6rem;
+	opacity: 0.3;
+}
+
+h1.timer-label {
+	display: inline;
+	color: rgb(187, 187, 187);
+	font-size: 1.4rem;
+}
+
+header.settings-header {
+	display: flex;
+	justify-content: space-between;
+	gap: 50%;
+	margin-bottom: 2rem;
+	border-bottom: solid 0.1rem rgb(218, 218, 218);
+	padding-bottom: 1rem;
+}
+
+img.close-btn {
+	height: 1.4rem;
+	width: 1.4rem;
+	opacity: 0.3;
+}
+
+div.time-settings-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	grid-column-gap: 5.5rem;
+	justify-items: start;
+	margin-bottom: 2.5rem;
+}
+
+input {
+	font-size: 1.6rem;
+	color: rgb(85, 85, 85);
+}
+
+input.time-input {
+	width: 6rem;
+}
+
+div.toggle-auto,
+div.settings-interval {
+	display: flex;
+	justify-content: space-between;
+}
+
+div.settings-interval {
+	border-bottom: solid 0.1rem rgb(210, 210, 210);
+	padding-bottom: 1rem;
+	margin-bottom: 1rem;
+}
+
+span.sec-settings-label {
+	font-size: 1.6rem;
+}
+
+div.toggle-auto,
+div.settings-interval {
+	margin-bottom: 2rem;
+}
+
+input.long-break-interval-input {
+	width: 5rem;
+}
+
+button.ok-settings {
+	background-color: rgb(34, 34, 34, 0.9);
+	width: 7rem;
+	height: 3.6rem;
+	font-weight: normal;
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 2px;
+}
+
+button.ok-settings:hover {
+	background-color: rgb(34, 34, 34);
+}
+
+footer.settings-footer {
+	display: flex;
+	justify-content: flex-end;
+}
+
+p.settings-label {
+	font-weight: bold;
+	color: grey;
+	font-size: 1.4rem;
+	color: rgb(187, 187, 187);
+	margin-bottom: 0.4rem;
+}
+
+input.time-input {
+	background-color: rgb(240, 240, 240);
+	border: none;
+	height: 3rem;
+	border-radius: 0.4rem;
+	width: 7.8rem;
+}
+
+span.auto-start-breaks,
+span.auto-start-pomodoro,
+span.long-break-interval {
+	font-weight: bold;
+}
+
+button.color-picker-btn {
+	height: 2rem;
+	width: 2rem;
+	background-color: blue;
+	margin-left: 0.5rem;
+}
+
+div.color-section {
+	display: flex;
+	justify-content: space-between;
+}
+
+p.color-themes {
+	font-size: 1.2rem;
+}
