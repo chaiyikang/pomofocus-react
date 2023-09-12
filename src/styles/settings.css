@@ -129,6 +129,7 @@ div.toggle-auto,
 div.settings-interval {
 	display: flex;
 	justify-content: space-between;
+	margin-bottom: 2rem;
 }
 
 div.settings-interval {
@@ -139,11 +140,7 @@ div.settings-interval {
 
 span.sec-settings-label {
 	font-size: 1.6rem;
-}
-
-div.toggle-auto,
-div.settings-interval {
-	margin-bottom: 2rem;
+	font-weight: bold;
 }
 
 input.long-break-interval-input {
@@ -183,8 +180,6 @@ input.time-input {
 	width: 7.8rem;
 }
 
-span.auto-start-breaks,
-span.auto-start-pomodoro,
 span.long-break-interval {
 	font-weight: bold;
 }
