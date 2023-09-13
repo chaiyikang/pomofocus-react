@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavBar } from "./components/NavBar";
 import { Settings } from "./components/Settings";
 import { Report } from "./components/Report";
@@ -15,10 +15,11 @@ import nextWhite from "./img/next-white3.png";
 
 const defaultSettings = {
 	lengthsSec: {
-		pomodoro: 5,
-		shortBreak: 5 * 60,
-		longBreak: 15 * 60,
+		pomodoro: 2,
+		shortBreak: 1,
+		longBreak: 5,
 	},
+	interval: 4,
 };
 
 function App() {
@@ -44,10 +45,11 @@ function App() {
 
 function AppWindow({ children }) {
 	const [settings, setSettings] = useState(defaultSettings);
-	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoroLengthSec);
+	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoro);
 	const [timerRunning, setTimerRunning] = useState(false);
 	const intervalID = useRef(false);
 	const [activeType, setActiveType] = useState("pomodoro");
+	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
 
 	function handleToggleTimer() {
 		// stop
@@ -61,7 +63,7 @@ function AppWindow({ children }) {
 		const timeStampEnd = timeStampStart + secondsLeft * 1000;
 
 		intervalID.current = setInterval(() => {
-			countdown(timeStampEnd);
+			countdownAndControlEnded(timeStampEnd);
 		}, 1000);
 	}
 
@@ -70,36 +72,75 @@ function AppWindow({ children }) {
 			stopTimer();
 		}
 		const clickedType = click.target.dataset.type;
-		console.log("🚀 ~ file: App.js:73 ~ handleToggleType ~ clickedType:", clickedType);
 		setActiveType(clickedType);
 		const resetDuration = settings.lengthsSec[clickedType];
 		setSecondsLeft(resetDuration);
+	}
+
+	function countdownAndControlEnded(timeStampEnd) {
+		let timeStampCurrent = new Date().getTime();
+		let timeLeftSec = Math.round((timeStampEnd - timeStampCurrent) / 1000);
+		setSecondsLeft(timeLeftSec);
+		if (timeLeftSec > 0) {
+			return;
+		}
+		stopTimer();
+		controlTimerEnded();
+	}
+
+	function handleSkip() {
+		stopTimer();
+		controlTimerEnded();
+	}
+
+	function controlTimerEnded() {
+		const nextType = getNextType();
+		if (nextType !== "pomodoro") {
+			setWorkSetsCompleted((sets) => sets + 1);
+		}
+
+		setSecondsLeft(settings.lengthsSec[nextType]);
+		setActiveType(nextType);
+	}
+
+	function getNextType() {
+		const nextIsPomodoro = activeType !== "pomodoro";
+		const nextIsLongBreak = (workSetsCompleted + 1) % settings.interval === 0;
+		if (nextIsPomodoro) return "pomodoro";
+		if (nextIsLongBreak) return "longBreak";
+		return "shortBreak";
 	}
 
 	function stopTimer() {
 		clearInterval(intervalID.current);
 		setTimerRunning(false);
 	}
-
-	function countdown(timeStampEnd) {
-		let timeStampCurrent = new Date().getTime();
-		let timeLeftSec = Math.round((timeStampEnd - timeStampCurrent) / 1000);
-		setSecondsLeft(timeLeftSec);
-		if (timeLeftSec <= 0) stopTimer();
-	}
-
 	return (
 		<>
 			<main className="container">
 				<div className="app-window">
 					<div className="buttons types">
-						<button onClick={handleToggleType} data-type="pomodoro" className="types">
+						<button
+							onClick={handleToggleType}
+							data-type="pomodoro"
+							className={`types ${activeType === "pomodoro" ? "button-active" : ""}`}
+						>
 							Pomodoro
 						</button>
-						<button onClick={handleToggleType} data-type="shortBreak" className="types">
+						<button
+							onClick={handleToggleType}
+							data-type="shortBreak"
+							className={`types ${
+								activeType === "shortBreak" ? "button-active" : ""
+							}`}
+						>
 							Short Break
 						</button>
-						<button onClick={handleToggleType} data-type="longBreak" className="types">
+						<button
+							onClick={handleToggleType}
+							data-type="longBreak"
+							className={`types ${activeType === "longBreak" ? "button-active" : ""}`}
+						>
 							Long Break
 						</button>
 					</div>
@@ -115,9 +156,11 @@ function AppWindow({ children }) {
 					>
 						{timerRunning ? "STOP" : "START"}
 					</button>
-					<button className="skip-timer-btn">
-						<img className="skip-timer-img" src={nextWhite} alt="" />
-					</button>
+					{timerRunning && (
+						<button onClick={handleSkip} className="skip-timer-btn">
+							<img className="skip-timer-img" src={nextWhite} alt="" />
+						</button>
+					)}
 				</div>
 				<div className="app-info">
 					<p className="counter">#1</p>
