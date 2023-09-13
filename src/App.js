@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { NavBar } from "./components/NavBar";
 import { Settings } from "./components/Settings";
 import { Report } from "./components/Report";
@@ -14,9 +14,11 @@ import "./styles/toggle.css";
 import nextWhite from "./img/next-white3.png";
 
 const defaultSettings = {
-	pomodoroLengthSec: 5,
-	shortBreakLengthSec: 5 * 60,
-	longBreakLength: 15 * 60,
+	lengthsSec: {
+		pomodoro: 5,
+		shortBreak: 5 * 60,
+		longBreak: 15 * 60,
+	},
 };
 
 function App() {
@@ -42,29 +44,41 @@ function App() {
 
 function AppWindow({ children }) {
 	const [settings, setSettings] = useState(defaultSettings);
-	const [secondsLeft, setSecondsLeft] = useState(settings.pomodoroLengthSec);
+	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoroLengthSec);
 	const [timerRunning, setTimerRunning] = useState(false);
+	const intervalID = useRef(false);
+	const [activeType, setActiveType] = useState("pomodoro");
 
-	function stopTimer() {
-		clearInterval(timerRunning);
-		setTimerRunning(false);
-	}
-
-	function toggleTimer() {
+	function handleToggleTimer() {
 		// stop
 		if (timerRunning) {
 			return stopTimer();
 		}
 
 		// start
+		setTimerRunning(true);
 		const timeStampStart = new Date().getTime();
 		const timeStampEnd = timeStampStart + secondsLeft * 1000;
 
-		setTimerRunning(
-			setInterval(() => {
-				countdown(timeStampEnd);
-			}, 1000)
-		);
+		intervalID.current = setInterval(() => {
+			countdown(timeStampEnd);
+		}, 1000);
+	}
+
+	function handleToggleType(click) {
+		if (timerRunning) {
+			stopTimer();
+		}
+		const clickedType = click.target.dataset.type;
+		console.log("🚀 ~ file: App.js:73 ~ handleToggleType ~ clickedType:", clickedType);
+		setActiveType(clickedType);
+		const resetDuration = settings.lengthsSec[clickedType];
+		setSecondsLeft(resetDuration);
+	}
+
+	function stopTimer() {
+		clearInterval(intervalID.current);
+		setTimerRunning(false);
 	}
 
 	function countdown(timeStampEnd) {
@@ -79,9 +93,15 @@ function AppWindow({ children }) {
 			<main className="container">
 				<div className="app-window">
 					<div className="buttons types">
-						<button className="pomodoro types">Pomodoro</button>
-						<button className="short-break types">Short Break</button>
-						<button className="long-break types">Long Break</button>
+						<button onClick={handleToggleType} data-type="pomodoro" className="types">
+							Pomodoro
+						</button>
+						<button onClick={handleToggleType} data-type="shortBreak" className="types">
+							Short Break
+						</button>
+						<button onClick={handleToggleType} data-type="longBreak" className="types">
+							Long Break
+						</button>
 					</div>
 					<time className="timer">
 						{Math.floor(secondsLeft / 60)
@@ -90,7 +110,7 @@ function AppWindow({ children }) {
 						:{(secondsLeft % 60).toString().padStart(2, 0)}
 					</time>
 					<button
-						onClick={toggleTimer}
+						onClick={handleToggleTimer}
 						className={`start-stop ${timerRunning ? "pressToStop" : ""}`}
 					>
 						{timerRunning ? "STOP" : "START"}
