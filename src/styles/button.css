@@ -57,7 +57,7 @@ button:active {
 	transform: translateY(0.25rem);
 }
 
-button[data-state="stop"],
+button.pressToStop,
 button.start-stop:active {
 	transform: translateY(0.25rem);
 	box-shadow: none;

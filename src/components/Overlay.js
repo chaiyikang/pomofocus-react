@@ -1,3 +1,9 @@
-export function Overlay({ setOpen, callback = () => {} }) {
-	return <div onClick={callback} className="overlay"></div>;
+export function Overlay({ setOpen, zIndexValue = false, callback = () => {} }) {
+	return (
+		<div
+			style={zIndexValue ? { zIndex: zIndexValue } : {}}
+			onClick={callback}
+			className="overlay"
+		></div>
+	);
 }

@@ -13,73 +13,99 @@ import "./styles/settings.css";
 import "./styles/toggle.css";
 import nextWhite from "./img/next-white3.png";
 
+const defaultSettings = {
+	pomodoroLengthSec: 5,
+	shortBreakLengthSec: 5 * 60,
+	longBreakLength: 15 * 60,
+};
+
 function App() {
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [reportOpen, setReportOpen] = useState(false);
-	const [colorPickerOpen, setColorPickerOpen] = useState(false);
 
 	return (
 		<>
 			<NavBar setSettingsOpen={setSettingsOpen} setReportOpen={setReportOpen} />
-			<AppWindow />
-			{settingsOpen && (
-				<Settings
-					closeSettings={() => {
-						setSettingsOpen(false);
-					}}
-					setColorPickerOpen={setColorPickerOpen}
-				/>
-			)}
-			{reportOpen && (
-				<Report
-					closeReport={() => {
-						setReportOpen(false);
-					}}
-				/>
-			)}
-			{colorPickerOpen && <ColorPickerModal />}
+			<AppWindow>
+				{settingsOpen && <Settings setSettingsOpen={setSettingsOpen} />}
+				{reportOpen && (
+					<Report
+						closeReport={() => {
+							setReportOpen(false);
+						}}
+					/>
+				)}
+			</AppWindow>
 		</>
 	);
 }
 
-function AppWindow() {
-	return (
-		<main className="container">
-			<div className="app-window">
-				<div className="buttons types">
-					<button className="pomodoro types">Pomodoro</button>
-					<button className="short-break types">Short Break</button>
-					<button className="long-break types">Long Break</button>
-				</div>
-				<time className="timer">25:00</time>
-				<button className="start-stop">START</button>
-				<button className="skip-timer-btn">
-					<img className="skip-timer-img" src={nextWhite} alt="" />
-				</button>
-			</div>
-			<div className="app-info">
-				<p className="counter">#1</p>
-				<p className="message">Time to Focus!</p>
-			</div>
-		</main>
-	);
-}
+function AppWindow({ children }) {
+	const [settings, setSettings] = useState(defaultSettings);
+	const [secondsLeft, setSecondsLeft] = useState(settings.pomodoroLengthSec);
+	const [timerRunning, setTimerRunning] = useState(false);
 
-function ColorPickerModal() {
+	function stopTimer() {
+		clearInterval(timerRunning);
+		setTimerRunning(false);
+	}
+
+	function toggleTimer() {
+		// stop
+		if (timerRunning) {
+			return stopTimer();
+		}
+
+		// start
+		const timeStampStart = new Date().getTime();
+		const timeStampEnd = timeStampStart + secondsLeft * 1000;
+
+		setTimerRunning(
+			setInterval(() => {
+				countdown(timeStampEnd);
+			}, 1000)
+		);
+	}
+
+	function countdown(timeStampEnd) {
+		let timeStampCurrent = new Date().getTime();
+		let timeLeftSec = Math.round((timeStampEnd - timeStampCurrent) / 1000);
+		setSecondsLeft(timeLeftSec);
+		if (timeLeftSec <= 0) stopTimer();
+	}
+
 	return (
-		<div className="color-picker-modal">
-			<h3 className="color-picker-title">Pick a color for Pomodoro</h3>
-			<div className="choose-color-squares">
-				<div className="choose-color-1 choose-color-square active" />
-				<div className="choose-color-2 choose-color-square" />
-				<div className="choose-color-3 choose-color-square" />
-				<div className="choose-color-4 choose-color-square" />
-				<div className="choose-color-5 choose-color-square" />
-				<div className="choose-color-6 choose-color-square" />
-				<div className="choose-color-7 choose-color-square" />
-				<div className="choose-color-8 choose-color-square" />
-			</div>
-		</div>
+		<>
+			<main className="container">
+				<div className="app-window">
+					<div className="buttons types">
+						<button className="pomodoro types">Pomodoro</button>
+						<button className="short-break types">Short Break</button>
+						<button className="long-break types">Long Break</button>
+					</div>
+					<time className="timer">
+						{Math.floor(secondsLeft / 60)
+							.toString()
+							.padStart(2, 0)}
+						:{(secondsLeft % 60).toString().padStart(2, 0)}
+					</time>
+					<button
+						onClick={toggleTimer}
+						className={`start-stop ${timerRunning ? "pressToStop" : ""}`}
+					>
+						{timerRunning ? "STOP" : "START"}
+					</button>
+					<button className="skip-timer-btn">
+						<img className="skip-timer-img" src={nextWhite} alt="" />
+					</button>
+				</div>
+				<div className="app-info">
+					<p className="counter">#1</p>
+					<p className="message">Time to Focus!</p>
+				</div>
+			</main>
+			{children}
+		</>
 	);
 }
 

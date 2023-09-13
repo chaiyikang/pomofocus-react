@@ -1,13 +1,16 @@
+import { useState } from "react";
 import clockBlack from "../img/clock-black.png";
 import themeBlack from "../img/theme-black.png";
 import { CloseButton } from "./CloseButton";
 import { Overlay } from "./Overlay";
+import { ColorPickerModal } from "./ColorPickerModal";
 
-export function Settings({ closeSettings, setColorPickerOpen }) {
+export function Settings({ setSettingsOpen }) {
+	const [colorPickerOpen, setColorPickerOpen] = useState(false);
 	return (
 		<>
 			<div className="settings">
-				<SettingsHeader closeButtonHandler={closeSettings} />
+				<SettingsHeader closeButtonHandler={() => setSettingsOpen(false)} />
 				<form className="settings-form">
 					<ToggleDiv toggleId="toggle1">Auto Start Breaks</ToggleDiv>
 					<ToggleDiv toggleId="toggle2">Auto Start Pomodoros</ToggleDiv>
@@ -17,7 +20,8 @@ export function Settings({ closeSettings, setColorPickerOpen }) {
 					</ColorPicker>
 				</form>
 			</div>
-			<Overlay callback={closeSettings} />
+			{colorPickerOpen && <ColorPickerModal setColorPickerOpen={setColorPickerOpen} />}
+			<Overlay callback={() => setSettingsOpen(false)} />
 		</>
 	);
 }
