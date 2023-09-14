@@ -15,11 +15,13 @@ import nextWhite from "./img/next-white3.png";
 
 const defaultSettings = {
 	lengthsSec: {
-		pomodoro: 2,
-		shortBreak: 1,
-		longBreak: 5,
+		pomodoro: 20 * 60,
+		shortBreak: 5 * 60,
+		longBreak: 15 * 60,
 	},
 	interval: 4,
+	toggleBreak: true,
+	togglePomodoro: false,
 };
 
 function App() {
@@ -107,7 +109,6 @@ function AppWindow({ children }) {
 		if (nextType !== "pomodoro") {
 			setWorkSetsCompleted((sets) => sets + 1);
 		}
-
 		setSecondsLeft(settings.lengthsSec[nextType]);
 		setActiveType(nextType);
 	}
