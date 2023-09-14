@@ -15,9 +15,9 @@ import nextWhite from "./img/next-white3.png";
 
 const defaultSettings = {
 	lengthsSec: {
-		pomodoro: 20 * 60,
-		shortBreak: 5 * 60,
-		longBreak: 15 * 60,
+		pomodoro: 25,
+		shortBreak: 5,
+		longBreak: 15,
 	},
 	interval: 4,
 	toggleBreak: true,
@@ -52,6 +52,9 @@ function AppWindow({ children }) {
 	const intervalID = useRef(false);
 	const [activeType, setActiveType] = useState("pomodoro");
 	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
+	const startStopBtn = useRef(null);
+	const [signalTimerEnded, setSignalTimerEnded] = useState(false);
+	const firstMount = useRef(0); //! only for production, we account for 2 first mounts
 
 	const pomodoroCycleDisplay = Math.ceil((workSetsCompleted + 1) / settings.interval);
 	const pomodoroRepDisplay = (workSetsCompleted % settings.interval) + 1;
@@ -64,9 +67,27 @@ function AppWindow({ children }) {
 
 	useEffect(
 		function handleChangeType() {
-			setSecondsLeft(settings.lengthsSec[activeType]);
+			console.log(`handleChangeType useEffect`);
+			setSecondsLeft(() => settings.lengthsSec[activeType]);
 		},
 		[activeType, settings.lengthsSec]
+	);
+
+	useEffect(
+		function handleAutoTimer() {
+			if (firstMount.current < 2) {
+				firstMount.current++;
+				return;
+			}
+			console.log(
+				"🚀 ~ file: App.js:82 ~ handleAutoTimer ~ secondsLeft before starting timer:",
+				secondsLeft
+			);
+			setTimeout(() => {
+				startStopBtn.current.click();
+			}, 0);
+		},
+		[signalTimerEnded]
 	);
 
 	function handleToggleTimer() {
@@ -115,6 +136,7 @@ function AppWindow({ children }) {
 			setWorkSetsCompleted((sets) => sets + 1);
 		}
 		setActiveType(nextType);
+		setSignalTimerEnded((signal) => !signal);
 	}
 
 	function getNextType() {
@@ -167,6 +189,7 @@ function AppWindow({ children }) {
 					<button
 						onClick={handleToggleTimer}
 						className={`start-stop ${timerRunning ? "pressToStop" : ""}`}
+						ref={startStopBtn}
 					>
 						{timerRunning ? "STOP" : "START"}
 					</button>
