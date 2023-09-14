@@ -62,6 +62,13 @@ function AppWindow({ children }) {
 	const breakRepDisplay =
 		workSetsCompleted === 0 ? 1 : workSetsCompleted % 4 === 0 ? 4 : workSetsCompleted % 4;
 
+	useEffect(
+		function handleChangeType() {
+			setSecondsLeft(settings.lengthsSec[activeType]);
+		},
+		[activeType, settings.lengthsSec]
+	);
+
 	function handleToggleTimer() {
 		// stop
 		if (timerRunning) {
@@ -84,8 +91,6 @@ function AppWindow({ children }) {
 		}
 		const clickedType = click.target.dataset.type;
 		setActiveType(clickedType);
-		const resetDuration = settings.lengthsSec[clickedType];
-		setSecondsLeft(resetDuration);
 	}
 
 	function countdownAndControlEnded(timeStampEnd) {
@@ -109,7 +114,6 @@ function AppWindow({ children }) {
 		if (nextType !== "pomodoro") {
 			setWorkSetsCompleted((sets) => sets + 1);
 		}
-		setSecondsLeft(settings.lengthsSec[nextType]);
 		setActiveType(nextType);
 	}
 
