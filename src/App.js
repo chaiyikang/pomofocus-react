@@ -51,6 +51,15 @@ function AppWindow({ children }) {
 	const [activeType, setActiveType] = useState("pomodoro");
 	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
 
+	const pomodoroCycleDisplay = Math.ceil((workSetsCompleted + 1) / settings.interval);
+	const pomodoroRepDisplay = (workSetsCompleted % settings.interval) + 1;
+	const breakCycleDisplay =
+		workSetsCompleted % settings.interval !== 0 || workSetsCompleted === 0
+			? Math.floor(workSetsCompleted / settings.interval) + 1
+			: workSetsCompleted / settings.interval;
+	const breakRepDisplay =
+		workSetsCompleted === 0 ? 1 : workSetsCompleted % 4 === 0 ? 4 : workSetsCompleted % 4;
+
 	function handleToggleTimer() {
 		// stop
 		if (timerRunning) {
@@ -163,7 +172,11 @@ function AppWindow({ children }) {
 					)}
 				</div>
 				<div className="app-info">
-					<p className="counter">#1</p>
+					<p className="counter">
+						{activeType === "pomodoro"
+							? `Cycle: #${pomodoroCycleDisplay} Rep: #${pomodoroRepDisplay}`
+							: `Cycle: #${breakCycleDisplay} Rep: #${breakRepDisplay}`}
+					</p>
 					<p className="message">Time to Focus!</p>
 				</div>
 			</main>
