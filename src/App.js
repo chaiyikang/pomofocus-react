@@ -48,13 +48,12 @@ function App() {
 function AppWindow({ children }) {
 	const [settings, setSettings] = useState(defaultSettings);
 	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoro);
+	const secondsLeftRef = useRef(settings.lengthsSec.pomodoro);
 	const [timerRunning, setTimerRunning] = useState(false);
+	const timerRunningRef = useRef(false);
 	const intervalID = useRef(false);
 	const [activeType, setActiveType] = useState("pomodoro");
 	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
-	const startStopBtn = useRef(null);
-	const [signalTimerEnded, setSignalTimerEnded] = useState(false);
-	const firstMount = useRef(0); //! only for production, we account for 2 first mounts
 
 	const pomodoroCycleDisplay = Math.ceil((workSetsCompleted + 1) / settings.interval);
 	const pomodoroRepDisplay = (workSetsCompleted % settings.interval) + 1;
@@ -65,41 +64,16 @@ function AppWindow({ children }) {
 	const breakRepDisplay =
 		workSetsCompleted === 0 ? 1 : workSetsCompleted % 4 === 0 ? 4 : workSetsCompleted % 4;
 
-	useEffect(
-		function handleChangeType() {
-			console.log(`handleChangeType useEffect`);
-			setSecondsLeft(() => settings.lengthsSec[activeType]);
-		},
-		[activeType, settings.lengthsSec]
-	);
-
-	useEffect(
-		function handleAutoTimer() {
-			if (firstMount.current < 2) {
-				firstMount.current++;
-				return;
-			}
-			console.log(
-				"🚀 ~ file: App.js:82 ~ handleAutoTimer ~ secondsLeft before starting timer:",
-				secondsLeft
-			);
-			setTimeout(() => {
-				startStopBtn.current.click();
-			}, 0);
-		},
-		[signalTimerEnded]
-	);
-
 	function handleToggleTimer() {
 		// stop
-		if (timerRunning) {
+		if (timerRunningRef.current) {
 			return stopTimer();
 		}
 
 		// start
-		setTimerRunning(true);
+		updateTimerRunning(true);
 		const timeStampStart = new Date().getTime();
-		const timeStampEnd = timeStampStart + secondsLeft * 1000;
+		const timeStampEnd = timeStampStart + secondsLeftRef.current * 1000;
 
 		intervalID.current = setInterval(() => {
 			countdownAndControlEnded(timeStampEnd);
@@ -107,17 +81,18 @@ function AppWindow({ children }) {
 	}
 
 	function handleToggleType(click) {
-		if (timerRunning) {
+		if (timerRunningRef.current) {
 			stopTimer();
 		}
 		const clickedType = click.target.dataset.type;
 		setActiveType(clickedType);
+		updateSecondsLeft(settings.lengthsSec[clickedType]);
 	}
 
 	function countdownAndControlEnded(timeStampEnd) {
 		let timeStampCurrent = new Date().getTime();
 		let timeLeftSec = Math.round((timeStampEnd - timeStampCurrent) / 1000);
-		setSecondsLeft(timeLeftSec);
+		updateSecondsLeft(timeLeftSec);
 		if (timeLeftSec > 0) {
 			return;
 		}
@@ -136,7 +111,19 @@ function AppWindow({ children }) {
 			setWorkSetsCompleted((sets) => sets + 1);
 		}
 		setActiveType(nextType);
-		setSignalTimerEnded((signal) => !signal);
+		updateSecondsLeft(settings.lengthsSec[nextType]);
+		if (nextType === "pomodoro" && settings.togglePomodoro) handleToggleTimer();
+		if (nextType !== "pomodoro" && settings.toggleBreak) handleToggleTimer();
+	}
+
+	function updateSecondsLeft(seconds, callback) {
+		setSecondsLeft(callback || seconds);
+		secondsLeftRef.current = seconds;
+	}
+
+	function updateTimerRunning(bool) {
+		timerRunningRef.current = bool;
+		setTimerRunning(bool);
 	}
 
 	function getNextType() {
@@ -149,7 +136,7 @@ function AppWindow({ children }) {
 
 	function stopTimer() {
 		clearInterval(intervalID.current);
-		setTimerRunning(false);
+		updateTimerRunning(false);
 	}
 	return (
 		<>
@@ -189,7 +176,6 @@ function AppWindow({ children }) {
 					<button
 						onClick={handleToggleTimer}
 						className={`start-stop ${timerRunning ? "pressToStop" : ""}`}
-						ref={startStopBtn}
 					>
 						{timerRunning ? "STOP" : "START"}
 					</button>
