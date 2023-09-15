@@ -5,7 +5,7 @@ import { CloseButton } from "./CloseButton";
 import { Overlay } from "./Overlay";
 import { ColorPickerModal } from "./ColorPickerModal";
 
-export function Settings({ setSettingsOpen, settings, setSettings }) {
+export function Settings({ setSettingsOpen, settings, setSettings, setSecondsLeft }) {
 	const [colorPickerOpen, setColorPickerOpen] = useState(false);
 	const [tempSettings, setTempSettings] = useState({ ...settings });
 
@@ -84,6 +84,11 @@ export function Settings({ setSettingsOpen, settings, setSettings }) {
 						<ColorPickerSquares setColorPickerOpen={setColorPickerOpen} />
 					</ColorPicker>
 				</form>
+				<footer className="settings-footer">
+					<button onClick={submitAndClose} type="button" className="ok-settings">
+						OK
+					</button>
+				</footer>
 			</div>
 			{colorPickerOpen && <ColorPickerModal setColorPickerOpen={setColorPickerOpen} />}
 			<Overlay callback={submitAndClose} />
@@ -213,11 +218,6 @@ function ColorPicker({ children }) {
 				<h3 className="color-theme-title">Color Themes</h3>
 				{children}
 			</div>
-			<footer className="settings-footer">
-				<button type="submit" className="ok-settings">
-					OK
-				</button>
-			</footer>
 		</div>
 	);
 }
