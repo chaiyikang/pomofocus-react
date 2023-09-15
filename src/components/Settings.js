@@ -7,46 +7,78 @@ import { ColorPickerModal } from "./ColorPickerModal";
 
 export function Settings({ setSettingsOpen, settings, setSettings }) {
 	const [colorPickerOpen, setColorPickerOpen] = useState(false);
+	const [tempSettings, setTempSettings] = useState({ ...settings });
+
 	function handleChangeSettings(event) {
 		const settingName = event.target.name;
 		if (settingName === "toggleBreak" || settingName === "togglePomodoro")
-			return setSettings((old) => ({ ...old, [settingName]: event.target.checked }));
+			return setTempSettings((old) => ({ ...old, [settingName]: event.target.checked }));
 
-		const valueSeconds = +event.target.value * 60;
-		const validValue = Math.sign(valueSeconds) === 1;
-		if (validValue)
-			setSettings((old) => ({
-				...old,
-				lengthsSec: { ...old.lengthsSec, [settingName]: valueSeconds },
-			}));
+		let input = event.target.value;
+		if (input !== "") input = +input;
+
+		if (settingName === "interval") {
+			return setTempSettings((old) => ({ ...old, interval: input }));
+		}
+		const inputMin = input === "" ? "" : input * 60;
+		setTempSettings((old) => ({
+			...old,
+			lengthsSec: { ...old.lengthsSec, [settingName]: inputMin },
+		}));
+	}
+
+	function submitAndClose() {
+		if (validatedAndUpdated()) return setSettingsOpen(false);
+		return;
+	}
+
+	function validatedAndUpdated() {
+		const {
+			lengthsSec: { pomodoro, shortBreak, longBreak },
+			interval,
+		} = tempSettings;
+		const inputValuesArr = [pomodoro, shortBreak, longBreak, interval];
+		console.log(
+			"🚀 ~ file: Settings.js:36 ~ validatedAndUpdated ~ inputValuesArr:",
+			inputValuesArr
+		);
+		let allValid = true;
+		inputValuesArr.forEach((input, index) => {
+			if (Math.sign(input) !== 1) allValid = false;
+			if (index !== 3) return;
+			if (!Number.isInteger(input)) allValid = false;
+		});
+		if (!allValid) return;
+		setSettings({ ...tempSettings });
+		return true;
 	}
 
 	return (
 		<>
 			<div className="settings">
-				<SettingsHeader closeButtonHandler={() => setSettingsOpen(false)} />
+				<SettingsHeader closeButtonHandler={submitAndClose} />
 				<form className="settings-form">
 					<LengthSettings
 						handleChangeSettings={handleChangeSettings}
-						settingsLength={settings.lengthsSec}
+						tempSettingsLength={tempSettings.lengthsSec}
 					/>
 					<ToggleDiv
 						handleChangeSettings={handleChangeSettings}
-						activeOrNot={settings.toggleBreak}
+						activeOrNot={tempSettings.toggleBreak}
 						name="toggleBreak"
 					>
 						Auto Start Breaks
 					</ToggleDiv>
 					<ToggleDiv
 						handleChangeSettings={handleChangeSettings}
-						activeOrNot={settings.togglePomodoro}
+						activeOrNot={tempSettings.togglePomodoro}
 						name="togglePomodoro"
 					>
 						Auto Start Pomodoros
 					</ToggleDiv>
 					<IntervalSettings
 						handleChangeSettings={handleChangeSettings}
-						currentInterval={settings.interval}
+						currentInterval={tempSettings.interval}
 					/>
 					<ColorPicker>
 						<ColorPickerSquares setColorPickerOpen={setColorPickerOpen} />
@@ -54,7 +86,7 @@ export function Settings({ setSettingsOpen, settings, setSettings }) {
 				</form>
 			</div>
 			{colorPickerOpen && <ColorPickerModal setColorPickerOpen={setColorPickerOpen} />}
-			<Overlay callback={() => setSettingsOpen(false)} />
+			<Overlay callback={submitAndClose} />
 		</>
 	);
 }
@@ -75,7 +107,7 @@ function SettingsHeader({ closeButtonHandler }) {
 	);
 }
 
-function LengthSettings({ settingsLength, handleChangeSettings }) {
+function LengthSettings({ tempSettingsLength, handleChangeSettings }) {
 	return (
 		<div className="time-settings-grid">
 			<p className="settings-label">Pomodoro</p>
@@ -85,9 +117,11 @@ function LengthSettings({ settingsLength, handleChangeSettings }) {
 				type="number"
 				name="pomodoro"
 				value={
-					settingsLength.pomodoro % 60 === 0
-						? settingsLength.pomodoro / 60
-						: (settingsLength.pomodoro / 60).toFixed(1)
+					tempSettingsLength.pomodoro === ""
+						? ""
+						: tempSettingsLength.pomodoro % 60 === 0
+						? tempSettingsLength.pomodoro / 60
+						: (tempSettingsLength.pomodoro / 60).toFixed(1)
 				}
 				onChange={handleChangeSettings}
 				min="0.1"
@@ -99,9 +133,11 @@ function LengthSettings({ settingsLength, handleChangeSettings }) {
 				type="number"
 				name="shortBreak"
 				value={
-					settingsLength.shortBreak % 60 === 0
-						? settingsLength.shortBreak / 60
-						: (settingsLength.shortBreak / 60).toFixed(1)
+					tempSettingsLength.shortBreak === ""
+						? ""
+						: tempSettingsLength.shortBreak % 60 === 0
+						? tempSettingsLength.shortBreak / 60
+						: (tempSettingsLength.shortBreak / 60).toFixed(1)
 				}
 				onChange={handleChangeSettings}
 				min="0.1"
@@ -113,9 +149,11 @@ function LengthSettings({ settingsLength, handleChangeSettings }) {
 				type="number"
 				name="longBreak"
 				value={
-					settingsLength.longBreak % 60 === 0
-						? settingsLength.longBreak / 60
-						: (settingsLength.longBreak / 60).toFixed(1)
+					tempSettingsLength.longBreak === ""
+						? ""
+						: tempSettingsLength.longBreak % 60 === 0
+						? tempSettingsLength.longBreak / 60
+						: (tempSettingsLength.longBreak / 60).toFixed(1)
 				}
 				onChange={handleChangeSettings}
 				min="0.1"
@@ -155,7 +193,7 @@ function IntervalSettings({ currentInterval, handleChangeSettings }) {
 			<input
 				name="interval"
 				type="number"
-				value={currentInterval}
+				value={currentInterval === "" ? "" : currentInterval}
 				onChange={handleChangeSettings}
 				min={0}
 				step={1}
