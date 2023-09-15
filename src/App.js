@@ -18,6 +18,11 @@ const defaultSettings = {
 		shortBreak: 5,
 		longBreak: 15,
 	},
+	colors: {
+		pomodoro: "rgb(186, 73, 73)",
+		shortBreak: "rgb(56, 133, 138)",
+		longBreak: "rgb(57, 112, 151)",
+	},
 	interval: 4,
 	toggleBreak: true,
 	togglePomodoro: false,

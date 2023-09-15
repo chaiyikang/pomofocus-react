@@ -96,7 +96,7 @@ export function Settings({ setSettingsOpen, settings, setSettings, setSecondsLef
 	);
 }
 
-function SettingsHeader({ closeButtonHandler }) {
+export function SettingsHeader({ closeButtonHandler }) {
 	return (
 		<>
 			<header className="settings-header">
@@ -112,7 +112,7 @@ function SettingsHeader({ closeButtonHandler }) {
 	);
 }
 
-function LengthSettings({ tempSettingsLength, handleChangeSettings }) {
+export function LengthSettings({ tempSettingsLength, handleChangeSettings }) {
 	return (
 		<div className="time-settings-grid">
 			<p className="settings-label">Pomodoro</p>
@@ -170,7 +170,7 @@ function LengthSettings({ tempSettingsLength, handleChangeSettings }) {
 	);
 }
 
-function ToggleDiv({ name, children, activeOrNot, handleChangeSettings }) {
+export function ToggleDiv({ name, children, activeOrNot, handleChangeSettings }) {
 	return (
 		<div className="toggle-auto">
 			<span className="sec-settings-label">{children}</span>
@@ -191,7 +191,7 @@ function ToggleDiv({ name, children, activeOrNot, handleChangeSettings }) {
 	);
 }
 
-function IntervalSettings({ currentInterval, handleChangeSettings }) {
+export function IntervalSettings({ currentInterval, handleChangeSettings }) {
 	return (
 		<div className="settings-interval">
 			<span className="sec-settings-label long-break-interval">Long Break Interval</span>
@@ -209,7 +209,7 @@ function IntervalSettings({ currentInterval, handleChangeSettings }) {
 	);
 }
 
-function ColorPicker({ children }) {
+export function ColorPicker({ children }) {
 	return (
 		<div className="color-picker">
 			<img className="color-picker-img" src={themeBlack} alt="" />
@@ -222,7 +222,7 @@ function ColorPicker({ children }) {
 	);
 }
 
-function ColorPickerSquares({ setColorPickerOpen }) {
+export function ColorPickerSquares({ setColorPickerOpen }) {
 	function handleOpenColorPickerModal() {
 		setColorPickerOpen(true);
 	}

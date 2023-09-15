@@ -1,6 +1,16 @@
-import { useRef, useState } from "react";
-import { Settings } from "./Settings";
+import { useEffect, useRef, useState } from "react";
+import {
+	SettingsHeader,
+	LengthSettings,
+	ToggleDiv,
+	IntervalSettings,
+	ColorPicker,
+	ColorPickerSquares,
+} from "./Settings";
+import { ColorPickerModal } from "./ColorPickerModal";
+import { Overlay } from "./Overlay";
 import nextWhite from "../img/next-white3.png";
+import { act } from "react-dom/test-utils";
 
 export function AppWindow({ children, settings, setSettings, settingsOpen, setSettingsOpen }) {
 	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoro);
@@ -10,6 +20,7 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 	const intervalID = useRef(false);
 	const [activeType, setActiveType] = useState("pomodoro");
 	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
+	const startStopBtn = useRef(null);
 
 	const pomodoroCycleDisplay = Math.ceil((workSetsCompleted + 1) / settings.interval);
 	const pomodoroRepDisplay = (workSetsCompleted % settings.interval) + 1;
@@ -19,6 +30,14 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 			: workSetsCompleted / settings.interval;
 	const breakRepDisplay =
 		workSetsCompleted === 0 ? 1 : workSetsCompleted % 4 === 0 ? 4 : workSetsCompleted % 4;
+
+	useEffect(
+		function updateBackgroundColor() {
+			document.body.style.backgroundColor = settings.colors[activeType];
+			startStopBtn.current.style.color = settings.colors[activeType];
+		},
+		[activeType, settings.colors]
+	);
 
 	function handleToggleTimer() {
 		// stop
@@ -94,6 +113,71 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 		clearInterval(intervalID.current);
 		updateTimerRunning(false);
 	}
+
+	// ? settings
+
+	const [colorPickerOpen, setColorPickerOpen] = useState(false);
+	const [tempSettings, setTempSettings] = useState({ ...settings });
+
+	function handleChangeSettings(event) {
+		const settingName = event.target.name;
+		if (settingName === "toggleBreak" || settingName === "togglePomodoro")
+			return setTempSettings((old) => ({ ...old, [settingName]: event.target.checked }));
+
+		let input = event.target.value;
+		if (input !== "") input = +input;
+
+		if (settingName === "interval") {
+			return setTempSettings((old) => ({ ...old, interval: input }));
+		}
+		const inputMin = input === "" ? "" : input * 60;
+		setTempSettings((old) => ({
+			...old,
+			lengthsSec: { ...old.lengthsSec, [settingName]: inputMin },
+		}));
+	}
+
+	function submitAndClose() {
+		if (validatedAndUpdated()) return setSettingsOpen(false);
+		return;
+	}
+
+	function validatedAndUpdated() {
+		const {
+			lengthsSec: { pomodoro, shortBreak, longBreak },
+			interval,
+		} = tempSettings;
+		const inputValuesArr = [pomodoro, shortBreak, longBreak, interval];
+		console.log(
+			"🚀 ~ file: Settings.js:36 ~ validatedAndUpdated ~ inputValuesArr:",
+			inputValuesArr
+		);
+		let allValid = true;
+		inputValuesArr.forEach((input, index) => {
+			if (Math.sign(input) !== 1) allValid = false;
+			if (index !== 3) return;
+			if (!Number.isInteger(input)) allValid = false;
+		});
+		if (!allValid) return false;
+		const timerWasRunning = timerRunning;
+		if (timerWasRunning) stopTimer();
+		if (settings.lengthsSec[activeType] === tempSettings.lengthsSec[activeType]) {
+			setSettings({ ...tempSettings });
+			return true;
+		}
+		const elapsed = settings.lengthsSec[activeType] - secondsLeft;
+		const updatedSeconds = tempSettings.lengthsSec[activeType] - elapsed;
+		if (updatedSeconds < 1) {
+			updateSecondsLeft(1);
+		} else {
+			updateSecondsLeft(tempSettings.lengthsSec[activeType] - elapsed);
+		}
+		if (timerWasRunning) handleToggleTimer();
+
+		setSettings({ ...tempSettings });
+		return true;
+	}
+
 	return (
 		<>
 			<main className="container">
@@ -132,6 +216,7 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 					<button
 						onClick={handleToggleTimer}
 						className={`start-stop ${timerRunning ? "pressToStop" : ""}`}
+						ref={startStopBtn}
 					>
 						{timerRunning ? "STOP" : "START"}
 					</button>
@@ -150,14 +235,48 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 					<p className="message">Time to Focus!</p>
 				</div>
 			</main>
+			{
+				//////////////////////////////////////////////}
+			}
 			{settingsOpen && (
-				<Settings
-					setSettingsOpen={setSettingsOpen}
-					settings={settings}
-					setSettings={setSettings}
-					setSecondsLeft={setSecondsLeft}
-				/>
+				<div className="settings">
+					<SettingsHeader closeButtonHandler={submitAndClose} />
+					<form className="settings-form">
+						<LengthSettings
+							handleChangeSettings={handleChangeSettings}
+							tempSettingsLength={tempSettings.lengthsSec}
+						/>
+						<ToggleDiv
+							handleChangeSettings={handleChangeSettings}
+							activeOrNot={tempSettings.toggleBreak}
+							name="toggleBreak"
+						>
+							Auto Start Breaks
+						</ToggleDiv>
+						<ToggleDiv
+							handleChangeSettings={handleChangeSettings}
+							activeOrNot={tempSettings.togglePomodoro}
+							name="togglePomodoro"
+						>
+							Auto Start Pomodoros
+						</ToggleDiv>
+						<IntervalSettings
+							handleChangeSettings={handleChangeSettings}
+							currentInterval={tempSettings.interval}
+						/>
+						<ColorPicker>
+							<ColorPickerSquares setColorPickerOpen={setColorPickerOpen} />
+						</ColorPicker>
+					</form>
+					<footer className="settings-footer">
+						<button onClick={submitAndClose} type="button" className="ok-settings">
+							OK
+						</button>
+					</footer>
+				</div>
 			)}
+			{colorPickerOpen && <ColorPickerModal setColorPickerOpen={setColorPickerOpen} />}
+			{settingsOpen && <Overlay callback={submitAndClose} />}
 			{children}
 		</>
 	);
