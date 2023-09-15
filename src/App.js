@@ -27,12 +27,19 @@ const defaultSettings = {
 function App() {
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [reportOpen, setReportOpen] = useState(false);
+	const [settings, setSettings] = useState(defaultSettings);
 
 	return (
 		<>
 			<NavBar setSettingsOpen={setSettingsOpen} setReportOpen={setReportOpen} />
-			<AppWindow>
-				{settingsOpen && <Settings setSettingsOpen={setSettingsOpen} />}
+			<AppWindow settings={settings} setSettings={setSettings}>
+				{settingsOpen && (
+					<Settings
+						setSettingsOpen={setSettingsOpen}
+						settings={settings}
+						setSettings={setSettings}
+					/>
+				)}
 				{reportOpen && (
 					<Report
 						closeReport={() => {
@@ -45,8 +52,7 @@ function App() {
 	);
 }
 
-function AppWindow({ children }) {
-	const [settings, setSettings] = useState(defaultSettings);
+function AppWindow({ children, settings, setSettings }) {
 	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoro);
 	const secondsLeftRef = useRef(settings.lengthsSec.pomodoro);
 	const [timerRunning, setTimerRunning] = useState(false);
