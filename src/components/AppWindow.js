@@ -200,6 +200,7 @@ export function AppWindow({
 			tempSettings.lengthsSec[activeTypeRef.current]
 		) {
 			setSettings((old) => ({ ...tempSettings, colors: { ...old.colors } }));
+			if (timerRunning) handleToggleTimer();
 			return true;
 		}
 		const elapsed = settings.lengthsSec[activeTypeRef.current] - secondsLeft;

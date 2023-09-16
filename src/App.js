@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavBar } from "./components/NavBar";
 import { Report } from "./components/Report";
+import { useLocalStorageState } from "./hooks/useLocalStorageState";
 
 import "./styles/nav.css";
 import "./styles/style.css";
@@ -31,8 +32,10 @@ const defaultSettings = {
 function App() {
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [reportOpen, setReportOpen] = useState(false);
-	const [settings, setSettings] = useState(defaultSettings);
-	const [secondsFocused, setSecondsFocused] = useState(0);
+	const [settings, setSettings] = useLocalStorageState(defaultSettings, "settings");
+	// const [settings, setSettings] = useState(defaultSettings);
+	const [secondsFocused, setSecondsFocused] = useLocalStorageState(0, "secondsFocused");
+	// const [secondsFocused, setSecondsFocused] = useState(0);
 
 	useEffect(function requestNotificationPermission() {
 		if (Notification.permission !== "granted") {
