@@ -28,6 +28,7 @@ export function AppWindow({
 	const timerRunningRef = useRef(false);
 	const intervalID = useRef(false);
 	const [activeType, setActiveType] = useState("pomodoro");
+	const activeTypeRef = useRef("pomodoro");
 	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
 	const startStopBtn = useRef(null);
 	const [pickingColorFor, setPickingColorFor] = useState(null);
@@ -71,7 +72,7 @@ export function AppWindow({
 			stopTimer();
 		}
 		const clickedType = click.target.dataset.type;
-		setActiveType(clickedType);
+		updateActiveType(clickedType);
 		updateSecondsLeft(settings.lengthsSec[clickedType]);
 	}
 
@@ -79,14 +80,13 @@ export function AppWindow({
 		let timeStampCurrent = new Date().getTime();
 		let timeLeftSec = Math.round((timeStampEnd - timeStampCurrent) / 1000);
 		updateSecondsLeft(timeLeftSec);
-		if (activeType === "pomodoro") {
+		if (activeTypeRef.current === "pomodoro") {
 			setSecondsFocused((s) => s + 1);
 		}
 		if (timeLeftSec > 0) {
 			return;
 		}
 		endedAudio.current.play();
-
 		stopTimer();
 		controlTimerEnded();
 	}
@@ -101,7 +101,8 @@ export function AppWindow({
 		if (nextType !== "pomodoro") {
 			setWorkSetsCompleted((sets) => sets + 1);
 		}
-		setActiveType(nextType);
+		// !!!!!
+		updateActiveType(nextType);
 		updateSecondsLeft(settings.lengthsSec[nextType]);
 		if (nextType === "pomodoro" && settings.togglePomodoro) handleToggleTimer();
 		if (nextType !== "pomodoro" && settings.toggleBreak) handleToggleTimer();
@@ -112,13 +113,18 @@ export function AppWindow({
 		secondsLeftRef.current = seconds;
 	}
 
+	function updateActiveType(type) {
+		setActiveType(type);
+		activeTypeRef.current = type;
+	}
+
 	function updateTimerRunning(bool) {
 		timerRunningRef.current = bool;
 		setTimerRunning(bool);
 	}
 
 	function getNextType() {
-		const nextIsPomodoro = activeType !== "pomodoro";
+		const nextIsPomodoro = activeTypeRef.current !== "pomodoro";
 		const nextIsLongBreak = (workSetsCompleted + 1) % settings.interval === 0;
 		if (nextIsPomodoro) return "pomodoro";
 		if (nextIsLongBreak) return "longBreak";
@@ -174,16 +180,19 @@ export function AppWindow({
 		if (!allValid) return false;
 		const timerWasRunning = timerRunning;
 		if (timerWasRunning) stopTimer();
-		if (settings.lengthsSec[activeType] === tempSettings.lengthsSec[activeType]) {
+		if (
+			settings.lengthsSec[activeTypeRef.current] ===
+			tempSettings.lengthsSec[activeTypeRef.current]
+		) {
 			setSettings((old) => ({ ...tempSettings, colors: { ...old.colors } }));
 			return true;
 		}
-		const elapsed = settings.lengthsSec[activeType] - secondsLeft;
-		const updatedSeconds = tempSettings.lengthsSec[activeType] - elapsed;
+		const elapsed = settings.lengthsSec[activeTypeRef.current] - secondsLeft;
+		const updatedSeconds = tempSettings.lengthsSec[activeTypeRef.current] - elapsed;
 		if (updatedSeconds < 1) {
 			updateSecondsLeft(1);
 		} else {
-			updateSecondsLeft(tempSettings.lengthsSec[activeType] - elapsed);
+			updateSecondsLeft(tempSettings.lengthsSec[activeTypeRef.current] - elapsed);
 		}
 		if (timerWasRunning) handleToggleTimer();
 

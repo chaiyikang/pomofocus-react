@@ -14,9 +14,9 @@ import { AppWindow } from "./components/AppWindow";
 
 const defaultSettings = {
 	lengthsSec: {
-		pomodoro: 25,
-		shortBreak: 5,
-		longBreak: 15,
+		pomodoro: 3,
+		shortBreak: 3,
+		longBreak: 3,
 	},
 	colors: {
 		pomodoro: "rgb(186, 73, 73)",
