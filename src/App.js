@@ -34,6 +34,12 @@ function App() {
 	const [settings, setSettings] = useState(defaultSettings);
 	const [secondsFocused, setSecondsFocused] = useState(0);
 
+	useEffect(function requestNotificationPermission() {
+		if (Notification.permission !== "granted") {
+			Notification.requestPermission();
+		}
+	}, []);
+
 	return (
 		<>
 			<NavBar setSettingsOpen={setSettingsOpen} setReportOpen={setReportOpen} />

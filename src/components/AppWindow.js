@@ -83,6 +83,11 @@ export function AppWindow({
 		if (activeTypeRef.current === "pomodoro") {
 			setSecondsFocused((s) => s + 1);
 		}
+		if (timeLeftSec === 5 * 60) {
+			new Notification(`${formatIntervalString(activeTypeRef.current)}`, {
+				body: "5 minutes left!",
+			});
+		}
 		if (timeLeftSec > 0) {
 			return;
 		}
@@ -101,9 +106,15 @@ export function AppWindow({
 		if (nextType !== "pomodoro") {
 			setWorkSetsCompleted((sets) => sets + 1);
 		}
-		// !!!!!
 		updateActiveType(nextType);
 		updateSecondsLeft(settings.lengthsSec[nextType]);
+
+		const notificationMessage =
+			activeTypeRef.current === "pomodoro"
+				? "Time to work!"
+				: `Time for a ${formatIntervalString(activeTypeRef.current)}!`;
+		new Notification("Timer Ended!", { body: notificationMessage });
+
 		if (nextType === "pomodoro" && settings.togglePomodoro) handleToggleTimer();
 		if (nextType !== "pomodoro" && settings.toggleBreak) handleToggleTimer();
 	}
@@ -209,6 +220,12 @@ export function AppWindow({
 		return true;
 	}
 
+	function formatIntervalString(camelCase) {
+		const spacedString = camelCase.replace(/([A-Z])/g, " $1");
+		const displayType = spacedString.charAt(0).toUpperCase() + spacedString.slice(1);
+		return displayType;
+	}
+
 	return (
 		<>
 			<main className="container">
@@ -242,7 +259,10 @@ export function AppWindow({
 						{Math.floor(secondsLeft / 60)
 							.toString()
 							.padStart(2, 0)}
-						:{(secondsLeft % 60).toString().padStart(2, 0)}
+						:
+						{Math.round(secondsLeft % 60)
+							.toString()
+							.padStart(2, 0)}
 					</time>
 					<button
 						onClick={handleToggleTimer}
