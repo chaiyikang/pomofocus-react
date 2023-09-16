@@ -179,6 +179,10 @@ export function AppWindow({
 		});
 		if (!allValid) return false;
 		const timerWasRunning = timerRunning;
+		console.log(
+			"🚀 ~ file: AppWindow.js:182 ~ validatedAndUpdated ~ timerWasRunning:",
+			timerWasRunning
+		);
 		if (timerWasRunning) stopTimer();
 		if (
 			settings.lengthsSec[activeTypeRef.current] ===
@@ -194,6 +198,10 @@ export function AppWindow({
 		} else {
 			updateSecondsLeft(tempSettings.lengthsSec[activeTypeRef.current] - elapsed);
 		}
+		console.log(
+			"🚀 ~ file: AppWindow.js:200 ~ validatedAndUpdated ~ timerWasRunning:",
+			timerWasRunning
+		);
 		if (timerWasRunning) handleToggleTimer();
 
 		console.log("🚀 ~ file: AppWindow.js:190 ~ validatedAndUpdated ~ settings:", settings);

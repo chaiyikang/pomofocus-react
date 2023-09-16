@@ -14,7 +14,7 @@ import { AppWindow } from "./components/AppWindow";
 
 const defaultSettings = {
 	lengthsSec: {
-		pomodoro: 3,
+		pomodoro: 10,
 		shortBreak: 3,
 		longBreak: 3,
 	},
