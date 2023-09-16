@@ -10,6 +10,8 @@ import {
 import { ColorPickerModal } from "./ColorPickerModal";
 import { Overlay } from "./Overlay";
 import nextWhite from "../img/next-white3.png";
+import alarmWood from "../audio/alarm-wood.mp3";
+import buttonPress from "../audio/button-press.wav";
 
 export function AppWindow({
 	children,
@@ -29,6 +31,8 @@ export function AppWindow({
 	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
 	const startStopBtn = useRef(null);
 	const [pickingColorFor, setPickingColorFor] = useState(null);
+	const startAudio = useRef(null);
+	const endedAudio = useRef(null);
 
 	const pomodoroCycleDisplay = Math.ceil((workSetsCompleted + 1) / settings.interval);
 	const pomodoroRepDisplay = (workSetsCompleted % settings.interval) + 1;
@@ -47,13 +51,12 @@ export function AppWindow({
 		[activeType, settings.colors]
 	);
 
-	function handleToggleTimer() {
-		// stop
+	function handleToggleTimer(event) {
 		if (timerRunningRef.current) {
 			return stopTimer();
 		}
+		if (event) startAudio.current.play();
 
-		// start
 		updateTimerRunning(true);
 		const timeStampStart = new Date().getTime();
 		const timeStampEnd = timeStampStart + secondsLeftRef.current * 1000;
@@ -82,6 +85,8 @@ export function AppWindow({
 		if (timeLeftSec > 0) {
 			return;
 		}
+		endedAudio.current.play();
+
 		stopTimer();
 		controlTimerEnded();
 	}
@@ -299,6 +304,8 @@ export function AppWindow({
 			)}
 			{settingsOpen && <Overlay callback={submitAndClose} />}
 			{children}
+			<audio ref={startAudio} src={buttonPress} />
+			<audio ref={endedAudio} src={alarmWood} />
 		</>
 	);
 }
