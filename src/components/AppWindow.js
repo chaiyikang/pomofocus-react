@@ -10,9 +10,16 @@ import {
 import { ColorPickerModal } from "./ColorPickerModal";
 import { Overlay } from "./Overlay";
 import nextWhite from "../img/next-white3.png";
-import { act } from "react-dom/test-utils";
 
-export function AppWindow({ children, settings, setSettings, settingsOpen, setSettingsOpen }) {
+export function AppWindow({
+	children,
+	settings,
+	setSettings,
+	settingsOpen,
+	setSettingsOpen,
+	secondsFocused,
+	setSecondsFocused,
+}) {
 	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoro);
 	const secondsLeftRef = useRef(settings.lengthsSec.pomodoro);
 	const [timerRunning, setTimerRunning] = useState(false);
@@ -21,6 +28,7 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 	const [activeType, setActiveType] = useState("pomodoro");
 	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
 	const startStopBtn = useRef(null);
+	const [pickingColorFor, setPickingColorFor] = useState(null);
 
 	const pomodoroCycleDisplay = Math.ceil((workSetsCompleted + 1) / settings.interval);
 	const pomodoroRepDisplay = (workSetsCompleted % settings.interval) + 1;
@@ -68,6 +76,9 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 		let timeStampCurrent = new Date().getTime();
 		let timeLeftSec = Math.round((timeStampEnd - timeStampCurrent) / 1000);
 		updateSecondsLeft(timeLeftSec);
+		if (activeType === "pomodoro") {
+			setSecondsFocused((s) => s + 1);
+		}
 		if (timeLeftSec > 0) {
 			return;
 		}
@@ -117,7 +128,8 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 	// ? settings
 
 	const [colorPickerOpen, setColorPickerOpen] = useState(false);
-	const [tempSettings, setTempSettings] = useState({ ...settings });
+	const { colors, ...omittedColors } = settings;
+	const [tempSettings, setTempSettings] = useState({ ...omittedColors });
 
 	function handleChangeSettings(event) {
 		const settingName = event.target.name;
@@ -148,10 +160,6 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 			interval,
 		} = tempSettings;
 		const inputValuesArr = [pomodoro, shortBreak, longBreak, interval];
-		console.log(
-			"🚀 ~ file: Settings.js:36 ~ validatedAndUpdated ~ inputValuesArr:",
-			inputValuesArr
-		);
 		let allValid = true;
 		inputValuesArr.forEach((input, index) => {
 			if (Math.sign(input) !== 1) allValid = false;
@@ -162,7 +170,7 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 		const timerWasRunning = timerRunning;
 		if (timerWasRunning) stopTimer();
 		if (settings.lengthsSec[activeType] === tempSettings.lengthsSec[activeType]) {
-			setSettings({ ...tempSettings });
+			setSettings((old) => ({ ...tempSettings, colors: { ...old.colors } }));
 			return true;
 		}
 		const elapsed = settings.lengthsSec[activeType] - secondsLeft;
@@ -174,7 +182,8 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 		}
 		if (timerWasRunning) handleToggleTimer();
 
-		setSettings({ ...tempSettings });
+		console.log("🚀 ~ file: AppWindow.js:190 ~ validatedAndUpdated ~ settings:", settings);
+		setSettings((old) => ({ ...tempSettings, colors: { ...old.colors } }));
 		return true;
 	}
 
@@ -265,7 +274,12 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 							currentInterval={tempSettings.interval}
 						/>
 						<ColorPicker>
-							<ColorPickerSquares setColorPickerOpen={setColorPickerOpen} />
+							<ColorPickerSquares
+								setColorPickerOpen={setColorPickerOpen}
+								pickingColorFor={pickingColorFor}
+								setPickingColorFor={setPickingColorFor}
+								settings={settings}
+							/>
 						</ColorPicker>
 					</form>
 					<footer className="settings-footer">
@@ -275,7 +289,14 @@ export function AppWindow({ children, settings, setSettings, settingsOpen, setSe
 					</footer>
 				</div>
 			)}
-			{colorPickerOpen && <ColorPickerModal setColorPickerOpen={setColorPickerOpen} />}
+			{colorPickerOpen && (
+				<ColorPickerModal
+					settings={settings}
+					setSettings={setSettings}
+					setColorPickerOpen={setColorPickerOpen}
+					pickingColorFor={pickingColorFor}
+				/>
+			)}
 			{settingsOpen && <Overlay callback={submitAndClose} />}
 			{children}
 		</>

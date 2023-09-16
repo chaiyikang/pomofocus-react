@@ -32,6 +32,7 @@ function App() {
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [reportOpen, setReportOpen] = useState(false);
 	const [settings, setSettings] = useState(defaultSettings);
+	const [secondsFocused, setSecondsFocused] = useState(0);
 
 	return (
 		<>
@@ -41,12 +42,15 @@ function App() {
 				setSettings={setSettings}
 				settingsOpen={settingsOpen}
 				setSettingsOpen={setSettingsOpen}
+				secondsFocused={secondsFocused}
+				setSecondsFocused={setSecondsFocused}
 			>
 				{reportOpen && (
 					<Report
 						closeReport={() => {
 							setReportOpen(false);
 						}}
+						secondsFocused={secondsFocused}
 					/>
 				)}
 			</AppWindow>

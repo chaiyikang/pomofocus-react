@@ -5,96 +5,105 @@ import { CloseButton } from "./CloseButton";
 import { Overlay } from "./Overlay";
 import { ColorPickerModal } from "./ColorPickerModal";
 
-export function Settings({ setSettingsOpen, settings, setSettings, setSecondsLeft }) {
-	const [colorPickerOpen, setColorPickerOpen] = useState(false);
-	const [tempSettings, setTempSettings] = useState({ ...settings });
+// export function Settings({ setSettingsOpen, settings, setSettings, setSecondsLeft }) {
+// 	const [colorPickerOpen, setColorPickerOpen] = useState(false);
+// 	const [tempSettings, setTempSettings] = useState({ ...settings });
 
-	function handleChangeSettings(event) {
-		const settingName = event.target.name;
-		if (settingName === "toggleBreak" || settingName === "togglePomodoro")
-			return setTempSettings((old) => ({ ...old, [settingName]: event.target.checked }));
+// 	function handleChangeSettings(event) {
+// 		const settingName = event.target.name;
+// 		if (settingName === "toggleBreak" || settingName === "togglePomodoro")
+// 			return setTempSettings((old) => ({ ...old, [settingName]: event.target.checked }));
 
-		let input = event.target.value;
-		if (input !== "") input = +input;
+// 		let input = event.target.value;
+// 		if (input !== "") input = +input;
 
-		if (settingName === "interval") {
-			return setTempSettings((old) => ({ ...old, interval: input }));
-		}
-		const inputMin = input === "" ? "" : input * 60;
-		setTempSettings((old) => ({
-			...old,
-			lengthsSec: { ...old.lengthsSec, [settingName]: inputMin },
-		}));
-	}
+// 		if (settingName === "interval") {
+// 			return setTempSettings((old) => ({ ...old, interval: input }));
+// 		}
+// 		const inputMin = input === "" ? "" : input * 60;
+// 		setTempSettings((old) => ({
+// 			...old,
+// 			lengthsSec: { ...old.lengthsSec, [settingName]: inputMin },
+// 		}));
+// 	}
 
-	function submitAndClose() {
-		if (validatedAndUpdated()) return setSettingsOpen(false);
-		return;
-	}
+// 	function submitAndClose() {
+// 		if (validatedAndUpdated()) return setSettingsOpen(false);
+// 		return;
+// 	}
 
-	function validatedAndUpdated() {
-		const {
-			lengthsSec: { pomodoro, shortBreak, longBreak },
-			interval,
-		} = tempSettings;
-		const inputValuesArr = [pomodoro, shortBreak, longBreak, interval];
-		console.log(
-			"🚀 ~ file: Settings.js:36 ~ validatedAndUpdated ~ inputValuesArr:",
-			inputValuesArr
-		);
-		let allValid = true;
-		inputValuesArr.forEach((input, index) => {
-			if (Math.sign(input) !== 1) allValid = false;
-			if (index !== 3) return;
-			if (!Number.isInteger(input)) allValid = false;
-		});
-		if (!allValid) return;
-		setSettings({ ...tempSettings });
-		return true;
-	}
+// 	function validatedAndUpdated() {
+// 		const {
+// 			lengthsSec: { pomodoro, shortBreak, longBreak },
+// 			interval,
+// 		} = tempSettings;
+// 		const inputValuesArr = [pomodoro, shortBreak, longBreak, interval];
+// 		console.log(
+// 			"🚀 ~ file: Settings.js:36 ~ validatedAndUpdated ~ inputValuesArr:",
+// 			inputValuesArr
+// 		);
+// 		let allValid = true;
+// 		inputValuesArr.forEach((input, index) => {
+// 			if (Math.sign(input) !== 1) allValid = false;
+// 			if (index !== 3) return;
+// 			if (!Number.isInteger(input)) allValid = false;
+// 		});
+// 		if (!allValid) return;
+// 		setSettings({ ...tempSettings });
+// 		return true;
+// 	}
 
-	return (
-		<>
-			<div className="settings">
-				<SettingsHeader closeButtonHandler={submitAndClose} />
-				<form className="settings-form">
-					<LengthSettings
-						handleChangeSettings={handleChangeSettings}
-						tempSettingsLength={tempSettings.lengthsSec}
-					/>
-					<ToggleDiv
-						handleChangeSettings={handleChangeSettings}
-						activeOrNot={tempSettings.toggleBreak}
-						name="toggleBreak"
-					>
-						Auto Start Breaks
-					</ToggleDiv>
-					<ToggleDiv
-						handleChangeSettings={handleChangeSettings}
-						activeOrNot={tempSettings.togglePomodoro}
-						name="togglePomodoro"
-					>
-						Auto Start Pomodoros
-					</ToggleDiv>
-					<IntervalSettings
-						handleChangeSettings={handleChangeSettings}
-						currentInterval={tempSettings.interval}
-					/>
-					<ColorPicker>
-						<ColorPickerSquares setColorPickerOpen={setColorPickerOpen} />
-					</ColorPicker>
-				</form>
-				<footer className="settings-footer">
-					<button onClick={submitAndClose} type="button" className="ok-settings">
-						OK
-					</button>
-				</footer>
-			</div>
-			{colorPickerOpen && <ColorPickerModal setColorPickerOpen={setColorPickerOpen} />}
-			<Overlay callback={submitAndClose} />
-		</>
-	);
-}
+// 	return (
+// 		<>
+// 			<div className="settings">
+// 				<SettingsHeader closeButtonHandler={submitAndClose} />
+// 				<form className="settings-form">
+// 					<LengthSettings
+// 						handleChangeSettings={handleChangeSettings}
+// 						tempSettingsLength={tempSettings.lengthsSec}
+// 					/>
+// 					<ToggleDiv
+// 						handleChangeSettings={handleChangeSettings}
+// 						activeOrNot={tempSettings.toggleBreak}
+// 						name="toggleBreak"
+// 					>
+// 						Auto Start Breaks
+// 					</ToggleDiv>
+// 					<ToggleDiv
+// 						handleChangeSettings={handleChangeSettings}
+// 						activeOrNot={tempSettings.togglePomodoro}
+// 						name="togglePomodoro"
+// 					>
+// 						Auto Start Pomodoros
+// 					</ToggleDiv>
+// 					<IntervalSettings
+// 						handleChangeSettings={handleChangeSettings}
+// 						currentInterval={tempSettings.interval}
+// 					/>
+// 					<ColorPicker>
+// 						<ColorPickerSquares
+// 							settings={settings}
+// 							setColorPickerOpen={setColorPickerOpen}
+// 						/>
+// 					</ColorPicker>
+// 				</form>
+// 				<footer className="settings-footer">
+// 					<button onClick={submitAndClose} type="button" className="ok-settings">
+// 						OK
+// 					</button>
+// 				</footer>
+// 			</div>
+// 			{colorPickerOpen && (
+// 				<ColorPickerModal
+// 					setColorPickerOpen={setColorPickerOpen}
+// 					settings={settings}
+// 					setSettings={setSettings}
+// 				/>
+// 			)}
+// 			<Overlay callback={submitAndClose} />
+// 		</>
+// 	);
+// }
 
 export function SettingsHeader({ closeButtonHandler }) {
 	return (
@@ -222,27 +231,31 @@ export function ColorPicker({ children }) {
 	);
 }
 
-export function ColorPickerSquares({ setColorPickerOpen }) {
-	function handleOpenColorPickerModal() {
+export function ColorPickerSquares({ setColorPickerOpen, setPickingColorFor, settings }) {
+	function handleOpenColorPickerModal(type) {
+		setPickingColorFor(type);
 		setColorPickerOpen(true);
 	}
 
 	return (
 		<div className="squares">
 			<div
-				onClick={handleOpenColorPickerModal}
-				className="square pomodoro-square"
+				onClick={handleOpenColorPickerModal.bind(null, "pomodoro")}
+				className="square"
 				data-interval-type="pomodoro"
+				style={{ backgroundColor: settings.colors.pomodoro }}
 			/>
 			<div
-				onClick={handleOpenColorPickerModal}
+				onClick={handleOpenColorPickerModal.bind(null, "shortBreak")}
 				className="square short-break-square"
 				data-interval-type="shortBreak"
+				style={{ backgroundColor: settings.colors.shortBreak }}
 			/>
 			<div
-				onClick={handleOpenColorPickerModal}
+				onClick={handleOpenColorPickerModal.bind(null, "longBreak")}
 				className="square long-break-square"
 				data-interval-type="longBreak"
+				style={{ backgroundColor: settings.colors.longBreak }}
 			/>
 		</div>
 	);

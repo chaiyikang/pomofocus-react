@@ -2,7 +2,7 @@ import clockRed from "../img/clock-red.png";
 import { CloseButton } from "./CloseButton";
 import { Overlay } from "./Overlay";
 
-export function Report({ closeReport }) {
+export function Report({ closeReport, secondsFocused }) {
 	return (
 		<>
 			<div className="report">
@@ -16,7 +16,7 @@ export function Report({ closeReport }) {
 				<div className="card">
 					<img className="report-clock" src={clockRed} alt="" />
 					<div className="report-text">
-						<p className="display-hours">0</p>
+						<p className="display-hours">{secondsFocused}</p>
 						<p className="hours-focused-label">seconds focused</p>
 					</div>
 				</div>
