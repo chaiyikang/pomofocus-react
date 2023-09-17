@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import {
 	SettingsHeader,
 	LengthSettings,
@@ -22,14 +23,20 @@ export function AppWindow({
 	secondsFocused,
 	setSecondsFocused,
 }) {
-	const [secondsLeft, setSecondsLeft] = useState(settings.lengthsSec.pomodoro);
-	const secondsLeftRef = useRef(settings.lengthsSec.pomodoro);
-	const [timerRunning, setTimerRunning] = useState(false);
-	const timerRunningRef = useRef(false);
-	const intervalID = useRef(false);
-	const [activeType, setActiveType] = useState("pomodoro");
+	const isInitialMount = useRef(true);
+	const [activeType, setActiveType] = useLocalStorageState("pomodoro", "activeType");
 	const activeTypeRef = useRef("pomodoro");
-	const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
+	const secondsLeftRef = useRef(settings.lengthsSec.pomodoro);
+	const [secondsLeft, setSecondsLeft] = useLocalStorageState(
+		settings.lengthsSec[activeType],
+		"secondsLeft",
+		(s) => (secondsLeftRef.current = s)
+	);
+	const intervalID = useRef(false);
+	const timerRunningRef = useRef(false);
+	const [timerRunning, setTimerRunning] = useLocalStorageState(false, "timerRunning");
+	const [workSetsCompleted, setWorkSetsCompleted] = useLocalStorageState(0, "workSetsCompleted");
+	// const [workSetsCompleted, setWorkSetsCompleted] = useState(0);
 	const startStopBtn = useRef(null);
 	const [pickingColorFor, setPickingColorFor] = useState(null);
 	const startAudio = useRef(null);
@@ -45,6 +52,17 @@ export function AppWindow({
 		workSetsCompleted === 0 ? 1 : workSetsCompleted % 4 === 0 ? 4 : workSetsCompleted % 4;
 
 	useEffect(
+		function startPreviousTimer() {
+			if (!isInitialMount.current) return;
+			isInitialMount.current = false;
+			if (timerRunning) {
+				handleToggleTimer();
+			}
+		},
+		[handleToggleTimer, timerRunning]
+	);
+
+	useEffect(
 		function updateBackgroundColor() {
 			document.body.style.backgroundColor = settings.colors[activeType];
 			startStopBtn.current.style.color = settings.colors[activeType];
@@ -52,11 +70,25 @@ export function AppWindow({
 		[activeType, settings.colors]
 	);
 
+	function initialiseFirstSet() {}
+
 	function handleToggleTimer(event) {
 		if (timerRunningRef.current) {
 			return stopTimer();
 		}
-		if (event) startAudio.current.play();
+		if (event) {
+			try {
+				startAudio.current
+					.play()
+					.catch((error) =>
+						console.error(
+							"An audio file was supposed to play, but was blocked by chrome because you have not interacted with the page. To resolve this, click anywhere on the page."
+						)
+					);
+			} catch (error) {
+				console.error(error);
+			}
+		}
 
 		updateTimerRunning(true);
 		const timeStampStart = new Date().getTime();
@@ -91,7 +123,17 @@ export function AppWindow({
 		if (timeLeftSec > 0) {
 			return;
 		}
-		endedAudio.current.play();
+		try {
+			endedAudio.current
+				.play()
+				.catch((error) =>
+					console.error(
+						"An audio file was supposed to play, but was blocked by chrome because you have not interacted with the page. To resolve this, click anywhere on the page."
+					)
+				);
+		} catch (error) {
+			console.error(error);
+		}
 		stopTimer();
 		controlTimerEnded();
 	}
@@ -210,10 +252,6 @@ export function AppWindow({
 		} else {
 			updateSecondsLeft(tempSettings.lengthsSec[activeTypeRef.current] - elapsed);
 		}
-		console.log(
-			"🚀 ~ file: AppWindow.js:200 ~ validatedAndUpdated ~ timerWasRunning:",
-			timerWasRunning
-		);
 		if (timerWasRunning) handleToggleTimer();
 
 		console.log("🚀 ~ file: AppWindow.js:190 ~ validatedAndUpdated ~ settings:", settings);
@@ -284,7 +322,11 @@ export function AppWindow({
 							? `Cycle: #${pomodoroCycleDisplay} Rep: #${pomodoroRepDisplay}`
 							: `Cycle: #${breakCycleDisplay} Rep: #${breakRepDisplay}`}
 					</p>
-					<p className="message">Time to Focus!</p>
+					<p className="message">
+						{activeTypeRef.current === "pomodoro"
+							? "Time to work!"
+							: `Time for a ${formatIntervalString(activeTypeRef.current)}!`}
+					</p>
 				</div>
 			</main>
 			{
