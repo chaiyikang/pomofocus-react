@@ -52,6 +52,18 @@ export function AppWindow({
 		workSetsCompleted === 0 ? 1 : workSetsCompleted % 4 === 0 ? 4 : workSetsCompleted % 4;
 
 	useEffect(
+		function updateTitle() {
+			const timeString = `${Math.floor(secondsLeft / 60)
+				.toString()
+				.padStart(2, 0)}:${Math.round(secondsLeft % 60)
+				.toString()
+				.padStart(2, 0)}`;
+			document.title = `${formatIntervalString(activeType)} || ${timeString}`;
+		},
+		[secondsLeft, activeType]
+	);
+
+	useEffect(
 		function startPreviousTimer() {
 			if (!isInitialMount.current) return;
 			isInitialMount.current = false;
